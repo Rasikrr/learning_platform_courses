@@ -7,7 +7,7 @@ option go_package = "github.com/Rasikrr/learning_platform_courses/pkg/server/cou
 package courses;
 
 service Courses {
-  rpc Create(CreateCourseRequest) returns (EmptySuccessResponse);
+  rpc CreateCourse(CreateCourseRequest) returns (EmptySuccessResponse);
   rpc GetCoursesByParams(GetCoursesByParamsRequest) returns (GetCoursesByParamsResponse);
   rpc GetCourseByID(GetCourseByIDRequest) returns (GetCourseByIDResponse);
   rpc GetAllCategories(GetCategoriesRequest) returns (GetCategoriesResponse);
@@ -111,7 +111,7 @@ message Topic {
   string title = 3;
   string description = 4;
   TopicContent content = 5;
-  repeated Quiz submissions = 6;
+  repeated Quiz quizzes = 6;
   repeated PracticalTask practical_tasks = 7;
   int32 order_number = 8;
   google.protobuf.Timestamp created_at = 9;

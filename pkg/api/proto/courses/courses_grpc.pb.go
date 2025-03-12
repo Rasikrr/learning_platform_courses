@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Courses_Create_FullMethodName                       = "/courses.Courses/Create"
+	Courses_CreateCourse_FullMethodName                 = "/courses.Courses/CreateCourse"
 	Courses_GetCoursesByParams_FullMethodName           = "/courses.Courses/GetCoursesByParams"
 	Courses_GetCourseByID_FullMethodName                = "/courses.Courses/GetCourseByID"
 	Courses_GetAllCategories_FullMethodName             = "/courses.Courses/GetAllCategories"
@@ -32,7 +32,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CoursesClient interface {
-	Create(ctx context.Context, in *CreateCourseRequest, opts ...grpc.CallOption) (*EmptySuccessResponse, error)
+	CreateCourse(ctx context.Context, in *CreateCourseRequest, opts ...grpc.CallOption) (*EmptySuccessResponse, error)
 	GetCoursesByParams(ctx context.Context, in *GetCoursesByParamsRequest, opts ...grpc.CallOption) (*GetCoursesByParamsResponse, error)
 	GetCourseByID(ctx context.Context, in *GetCourseByIDRequest, opts ...grpc.CallOption) (*GetCourseByIDResponse, error)
 	GetAllCategories(ctx context.Context, in *GetCategoriesRequest, opts ...grpc.CallOption) (*GetCategoriesResponse, error)
@@ -49,9 +49,9 @@ func NewCoursesClient(cc grpc.ClientConnInterface) CoursesClient {
 	return &coursesClient{cc}
 }
 
-func (c *coursesClient) Create(ctx context.Context, in *CreateCourseRequest, opts ...grpc.CallOption) (*EmptySuccessResponse, error) {
+func (c *coursesClient) CreateCourse(ctx context.Context, in *CreateCourseRequest, opts ...grpc.CallOption) (*EmptySuccessResponse, error) {
 	out := new(EmptySuccessResponse)
-	err := c.cc.Invoke(ctx, Courses_Create_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, Courses_CreateCourse_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (c *coursesClient) GetTasksByTopicIDAndOrderNum(ctx context.Context, in *Ge
 // All implementations must embed UnimplementedCoursesServer
 // for forward compatibility
 type CoursesServer interface {
-	Create(context.Context, *CreateCourseRequest) (*EmptySuccessResponse, error)
+	CreateCourse(context.Context, *CreateCourseRequest) (*EmptySuccessResponse, error)
 	GetCoursesByParams(context.Context, *GetCoursesByParamsRequest) (*GetCoursesByParamsResponse, error)
 	GetCourseByID(context.Context, *GetCourseByIDRequest) (*GetCourseByIDResponse, error)
 	GetAllCategories(context.Context, *GetCategoriesRequest) (*GetCategoriesResponse, error)
@@ -130,8 +130,8 @@ type CoursesServer interface {
 type UnimplementedCoursesServer struct {
 }
 
-func (UnimplementedCoursesServer) Create(context.Context, *CreateCourseRequest) (*EmptySuccessResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+func (UnimplementedCoursesServer) CreateCourse(context.Context, *CreateCourseRequest) (*EmptySuccessResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateCourse not implemented")
 }
 func (UnimplementedCoursesServer) GetCoursesByParams(context.Context, *GetCoursesByParamsRequest) (*GetCoursesByParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCoursesByParams not implemented")
@@ -164,20 +164,20 @@ func RegisterCoursesServer(s grpc.ServiceRegistrar, srv CoursesServer) {
 	s.RegisterService(&Courses_ServiceDesc, srv)
 }
 
-func _Courses_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Courses_CreateCourse_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateCourseRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CoursesServer).Create(ctx, in)
+		return srv.(CoursesServer).CreateCourse(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Courses_Create_FullMethodName,
+		FullMethod: Courses_CreateCourse_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CoursesServer).Create(ctx, req.(*CreateCourseRequest))
+		return srv.(CoursesServer).CreateCourse(ctx, req.(*CreateCourseRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -298,8 +298,8 @@ var Courses_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*CoursesServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Create",
-			Handler:    _Courses_Create_Handler,
+			MethodName: "CreateCourse",
+			Handler:    _Courses_CreateCourse_Handler,
 		},
 		{
 			MethodName: "GetCoursesByParams",
