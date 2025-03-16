@@ -2,6 +2,7 @@ package courses
 
 import (
 	"context"
+	"errors"
 	"github.com/Rasikrr/learning_platform_courses/internal/domain/entity"
 	"github.com/samber/lo"
 	"golang.org/x/sync/errgroup"
@@ -29,6 +30,7 @@ func (s *service) GetCoursesByParams(ctx context.Context, params *entity.GetCour
 			c.Category = *category
 		}
 	}
+
 	return courses, err
 }
 
@@ -65,30 +67,44 @@ func (s *service) GetAllCategories(ctx context.Context) ([]*entity.Category, err
 	return s.categoriesRepository.GetAll(ctx)
 }
 
-func (s *service) GetContentByTopicID(ctx context.Context, id string) (*entity.TopicContent, error) {
-	content, err := s.coursesCache.GetContentByTopicID(ctx, id)
+func (s *service) GetContentByTopicID(ctx context.Context, courseID, topicID string) (*entity.TopicContent, error) {
+	exist, err := s.topicsRepository.CheckIsExistByCourseIDAndTopicID(ctx, courseID, topicID)
+	if err != nil {
+		return nil, err
+	}
+	if !exist {
+		return nil, errors.New("topic not found")
+	}
+	content, err := s.coursesCache.GetContentByTopicID(ctx, topicID)
 	if err != nil {
 		return nil, err
 	}
 	if content != nil {
 		return content, nil
 	}
-	content, err = s.contentRepository.GetByTopicID(ctx, id)
+	content, err = s.contentRepository.GetByTopicID(ctx, topicID)
 	if err != nil {
 		return nil, err
 	}
-	if err = s.coursesCache.SetContentByTopicID(ctx, id, content); err != nil {
+	if err = s.coursesCache.SetContentByTopicID(ctx, topicID, content); err != nil {
 		return nil, err
 	}
 	return content, nil
 }
 
-func (s *service) GetQuizzesByTopicID(ctx context.Context, userID, topicID string) ([]*entity.Quiz, bool, error) {
+func (s *service) GetQuizzesByTopicID(ctx context.Context, userID, courseID, topicID string) ([]*entity.Quiz, bool, error) {
 	var (
 		quizzes []*entity.Quiz
 		passed  bool
 		g       errgroup.Group
 	)
+	exist, err := s.topicsRepository.CheckIsExistByCourseIDAndTopicID(ctx, courseID, topicID)
+	if err != nil {
+		return nil, false, err
+	}
+	if !exist {
+		return nil, false, errors.New("topic not found")
+	}
 	g.Go(func() error {
 		var err error
 		quizzes, err = s.coursesCache.GetQuizzesByTopicID(ctx, topicID)
@@ -120,10 +136,18 @@ func (s *service) GetQuizzesByTopicID(ctx context.Context, userID, topicID strin
 
 func (s *service) GetTasksByTopicIDAndOrderNum(
 	ctx context.Context,
-	id string,
+	courseID string,
+	topicID string,
 	order int,
 	userID string) (*entity.PracticalTask, *entity.TaskSubmission, error) {
-	task, err := s.tasksRepository.GetByTopicIDAndOrderNum(ctx, id, order)
+	exist, err := s.topicsRepository.CheckIsExistByCourseIDAndTopicID(ctx, courseID, topicID)
+	if err != nil {
+		return nil, nil, err
+	}
+	if !exist {
+		return nil, nil, errors.New("topic not found")
+	}
+	task, err := s.tasksRepository.GetByTopicIDAndOrderNum(ctx, topicID, order)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -208,4 +232,12 @@ func (s *service) mergeCourse(ctx context.Context, course *entity.Course) error 
 	course.Topics = topics
 
 	return nil
+}
+
+func (s *service) GetCoursesByIDs(ctx context.Context, ids []string) ([]*entity.Course, error) {
+	courses, err := s.coursesRepository.GetByIDs(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+	return courses, nil
 }

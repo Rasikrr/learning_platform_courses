@@ -22,6 +22,7 @@ const (
 	Courses_CreateCourse_FullMethodName                 = "/courses.Courses/CreateCourse"
 	Courses_GetCoursesByParams_FullMethodName           = "/courses.Courses/GetCoursesByParams"
 	Courses_GetCourseByID_FullMethodName                = "/courses.Courses/GetCourseByID"
+	Courses_GetCoursesByIDs_FullMethodName              = "/courses.Courses/GetCoursesByIDs"
 	Courses_GetAllCategories_FullMethodName             = "/courses.Courses/GetAllCategories"
 	Courses_GetContentByTopicID_FullMethodName          = "/courses.Courses/GetContentByTopicID"
 	Courses_GetQuizzesByTopicID_FullMethodName          = "/courses.Courses/GetQuizzesByTopicID"
@@ -35,6 +36,7 @@ type CoursesClient interface {
 	CreateCourse(ctx context.Context, in *CreateCourseRequest, opts ...grpc.CallOption) (*EmptySuccessResponse, error)
 	GetCoursesByParams(ctx context.Context, in *GetCoursesByParamsRequest, opts ...grpc.CallOption) (*GetCoursesByParamsResponse, error)
 	GetCourseByID(ctx context.Context, in *GetCourseByIDRequest, opts ...grpc.CallOption) (*GetCourseByIDResponse, error)
+	GetCoursesByIDs(ctx context.Context, in *GetCoursesByIDsRequest, opts ...grpc.CallOption) (*GetCoursesByIDsResponse, error)
 	GetAllCategories(ctx context.Context, in *GetCategoriesRequest, opts ...grpc.CallOption) (*GetCategoriesResponse, error)
 	GetContentByTopicID(ctx context.Context, in *GetContentByTopicIDRequest, opts ...grpc.CallOption) (*GetContentByTopicIDResponse, error)
 	GetQuizzesByTopicID(ctx context.Context, in *GetQuizzesByTopicIDRequest, opts ...grpc.CallOption) (*GetQuizzesByTopicIDResponse, error)
@@ -70,6 +72,15 @@ func (c *coursesClient) GetCoursesByParams(ctx context.Context, in *GetCoursesBy
 func (c *coursesClient) GetCourseByID(ctx context.Context, in *GetCourseByIDRequest, opts ...grpc.CallOption) (*GetCourseByIDResponse, error) {
 	out := new(GetCourseByIDResponse)
 	err := c.cc.Invoke(ctx, Courses_GetCourseByID_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coursesClient) GetCoursesByIDs(ctx context.Context, in *GetCoursesByIDsRequest, opts ...grpc.CallOption) (*GetCoursesByIDsResponse, error) {
+	out := new(GetCoursesByIDsResponse)
+	err := c.cc.Invoke(ctx, Courses_GetCoursesByIDs_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -119,6 +130,7 @@ type CoursesServer interface {
 	CreateCourse(context.Context, *CreateCourseRequest) (*EmptySuccessResponse, error)
 	GetCoursesByParams(context.Context, *GetCoursesByParamsRequest) (*GetCoursesByParamsResponse, error)
 	GetCourseByID(context.Context, *GetCourseByIDRequest) (*GetCourseByIDResponse, error)
+	GetCoursesByIDs(context.Context, *GetCoursesByIDsRequest) (*GetCoursesByIDsResponse, error)
 	GetAllCategories(context.Context, *GetCategoriesRequest) (*GetCategoriesResponse, error)
 	GetContentByTopicID(context.Context, *GetContentByTopicIDRequest) (*GetContentByTopicIDResponse, error)
 	GetQuizzesByTopicID(context.Context, *GetQuizzesByTopicIDRequest) (*GetQuizzesByTopicIDResponse, error)
@@ -138,6 +150,9 @@ func (UnimplementedCoursesServer) GetCoursesByParams(context.Context, *GetCourse
 }
 func (UnimplementedCoursesServer) GetCourseByID(context.Context, *GetCourseByIDRequest) (*GetCourseByIDResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCourseByID not implemented")
+}
+func (UnimplementedCoursesServer) GetCoursesByIDs(context.Context, *GetCoursesByIDsRequest) (*GetCoursesByIDsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCoursesByIDs not implemented")
 }
 func (UnimplementedCoursesServer) GetAllCategories(context.Context, *GetCategoriesRequest) (*GetCategoriesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllCategories not implemented")
@@ -214,6 +229,24 @@ func _Courses_GetCourseByID_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CoursesServer).GetCourseByID(ctx, req.(*GetCourseByIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Courses_GetCoursesByIDs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCoursesByIDsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoursesServer).GetCoursesByIDs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Courses_GetCoursesByIDs_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoursesServer).GetCoursesByIDs(ctx, req.(*GetCoursesByIDsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -308,6 +341,10 @@ var Courses_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetCourseByID",
 			Handler:    _Courses_GetCourseByID_Handler,
+		},
+		{
+			MethodName: "GetCoursesByIDs",
+			Handler:    _Courses_GetCoursesByIDs_Handler,
 		},
 		{
 			MethodName: "GetAllCategories",

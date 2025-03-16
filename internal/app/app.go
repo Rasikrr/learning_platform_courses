@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/Rasikrr/learning_platform_core/application"
 	coursesC "github.com/Rasikrr/learning_platform_courses/internal/cache/courses"
+	"github.com/Rasikrr/learning_platform_courses/internal/ports/grpc"
 	categoriesR "github.com/Rasikrr/learning_platform_courses/internal/repositories/categories"
 	contentR "github.com/Rasikrr/learning_platform_courses/internal/repositories/content"
 	coursesR "github.com/Rasikrr/learning_platform_courses/internal/repositories/courses"
@@ -46,6 +47,7 @@ func (a *App) Init(ctx context.Context) error {
 		a.initCaches,
 		a.initClients,
 		a.initServices,
+		a.initGRPCServer,
 	} {
 		if err := init(ctx); err != nil {
 			return err
@@ -86,6 +88,14 @@ func (a *App) initServices(_ context.Context) error {
 		a.quizzesSubmissionRepository,
 		a.taskSubmissionRepository,
 		a.coursesCache,
+	)
+	return nil
+}
+
+func (a *App) initGRPCServer(_ context.Context) error {
+	grpc.NewServer(
+		a.GrpcServer().Srv(),
+		a.coursesService,
 	)
 	return nil
 }

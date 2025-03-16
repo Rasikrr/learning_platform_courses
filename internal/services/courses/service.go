@@ -19,16 +19,18 @@ type Service interface {
 
 	GetCoursesByParams(ctx context.Context, params *entity.GetCoursesParams) ([]*entity.Course, error)
 	GetCourseByID(ctx context.Context, id string) (*entity.Course, error)
+	GetCoursesByIDs(ctx context.Context, ids []string) ([]*entity.Course, error)
 
 	GetAllCategories(ctx context.Context) ([]*entity.Category, error)
 
-	GetContentByTopicID(ctx context.Context, topicID string) (*entity.TopicContent, error)
+	GetContentByTopicID(ctx context.Context, courseID, topicID string) (*entity.TopicContent, error)
 
-	GetQuizzesByTopicID(ctx context.Context, userID, topicID string) ([]*entity.Quiz, bool, error)
+	GetQuizzesByTopicID(ctx context.Context, userID, courseID, topicID string) ([]*entity.Quiz, bool, error)
 
 	GetTasksByTopicIDAndOrderNum(
 		ctx context.Context,
-		id string,
+		courseID string,
+		topicID string,
 		order int,
 		userID string) (*entity.PracticalTask, *entity.TaskSubmission, error)
 }

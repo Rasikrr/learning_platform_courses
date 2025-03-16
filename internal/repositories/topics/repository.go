@@ -9,6 +9,7 @@ import (
 
 type Repository interface {
 	GetByCourseID(ctx context.Context, id string) ([]*entity.Topic, error)
+	CheckIsExistByCourseIDAndTopicID(ctx context.Context, courseID, topicID string) (bool, error)
 }
 
 type repository struct {
@@ -27,4 +28,12 @@ func (r *repository) GetByCourseID(ctx context.Context, ids string) ([]*entity.T
 		return nil, err
 	}
 	return mm.convert()
+}
+
+func (r *repository) CheckIsExistByCourseIDAndTopicID(ctx context.Context, courseID, topicID string) (bool, error) {
+	var exists bool
+	if err := pgxscan.Get(ctx, r.db, &exists, checkIsExistByCourseIDAndTopicIDStmt, courseID, topicID); err != nil {
+		return false, err
+	}
+	return exists, nil
 }

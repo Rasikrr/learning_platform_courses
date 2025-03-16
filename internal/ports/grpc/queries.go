@@ -12,9 +12,10 @@ func (s *server) GetCoursesByParams(ctx context.Context, req *pb.GetCoursesByPar
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "error getting courses by params: %v", err)
 	}
-	return &pb.GetCoursesByParamsResponse{
+	resp := &pb.GetCoursesByParamsResponse{
 		Courses: convertCoursesToPb(out),
-	}, nil
+	}
+	return resp, nil
 }
 
 func (s *server) GetCourseByID(ctx context.Context, req *pb.GetCourseByIDRequest) (*pb.GetCourseByIDResponse, error) {
@@ -23,6 +24,16 @@ func (s *server) GetCourseByID(ctx context.Context, req *pb.GetCourseByIDRequest
 		return nil, status.Errorf(codes.Internal, "error getting course by id: %v", err)
 	}
 	return &pb.GetCourseByIDResponse{Course: convertCourseToPb(out)}, nil
+}
+
+func (s *server) GetCoursesByIDs(ctx context.Context, req *pb.GetCoursesByIDsRequest) (*pb.GetCoursesByIDsResponse, error) {
+	out, err := s.coursesService.GetCoursesByIDs(ctx, req.GetIds())
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "error getting courses by ids: %v", err)
+	}
+	return &pb.GetCoursesByIDsResponse{
+		Courses: convertCoursesToPb(out),
+	}, nil
 }
 
 func (s *server) GetAllCategories(ctx context.Context, req *pb.GetCategoriesRequest) (*pb.GetCategoriesResponse, error) {
@@ -36,7 +47,7 @@ func (s *server) GetAllCategories(ctx context.Context, req *pb.GetCategoriesRequ
 }
 
 func (s *server) GetContentByTopicID(ctx context.Context, req *pb.GetContentByTopicIDRequest) (*pb.GetContentByTopicIDResponse, error) {
-	out, err := s.coursesService.GetContentByTopicID(ctx, req.GetTopicId())
+	out, err := s.coursesService.GetContentByTopicID(ctx, req.GetCourseId(), req.GetTopicId())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "error getting content by topic id: %v", err)
 	}
@@ -46,7 +57,12 @@ func (s *server) GetContentByTopicID(ctx context.Context, req *pb.GetContentByTo
 }
 
 func (s *server) GetQuizzesByTopicID(ctx context.Context, req *pb.GetQuizzesByTopicIDRequest) (*pb.GetQuizzesByTopicIDResponse, error) {
-	out, passed, err := s.coursesService.GetQuizzesByTopicID(ctx, req.GetUserId(), req.GetTopicId())
+	out, passed, err := s.coursesService.GetQuizzesByTopicID(
+		ctx,
+		req.UserId,
+		req.CourseId,
+		req.TopicId,
+	)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "error getting quizzes by topic id: %v", err)
 	}
@@ -57,7 +73,13 @@ func (s *server) GetQuizzesByTopicID(ctx context.Context, req *pb.GetQuizzesByTo
 }
 
 func (s *server) GetTasksByTopicIDAndOrderNum(ctx context.Context, req *pb.GetTasksByTopicIDAndOrderNumRequest) (*pb.GetTasksByTopicIDAndOrderNumResponse, error) {
-	out, _, err := s.coursesService.GetTasksByTopicIDAndOrderNum(ctx, req.GetId(), int(req.GetOrder()), req.GetUserId())
+	out, _, err := s.coursesService.GetTasksByTopicIDAndOrderNum(
+		ctx,
+		req.CourseId,
+		req.TopicId,
+		int(req.Order),
+		req.UserId,
+	)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "error getting tasks by topic id and order num: %v", err)
 	}

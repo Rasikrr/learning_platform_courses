@@ -5,4 +5,6 @@ const (
 						FROM topics 
 						WHERE course_id = $1
 						ORDER BY order_number`
+
+	checkIsExistByCourseIDAndTopicIDStmt = `SELECT EXISTS(SELECT id FROM topics WHERE course_id = $1 AND id = $2)`
 )
